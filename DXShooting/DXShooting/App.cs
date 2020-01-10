@@ -9,6 +9,9 @@ using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.Core;
 using Windows.Graphics.Display;
 using Windows.UI.Core;
+using Windows.UI.ViewManagement;
+using Windows.System;
+using System.Collections.Generic;
 
 namespace DXShooting
 {
@@ -34,8 +37,12 @@ namespace DXShooting
         {
             private SharpDX.Direct2D1.DeviceContext d2dDeviceContext;
             private Bitmap1 d2dTarget;
+            private Fighter fighterDisplay;
             private SwapChain1 swapChain;
             private CoreWindow mWindow;
+            private TransformedGeometry tFighterPath;
+            private SolidColorBrush fighterBrush;
+            private List<IDrawable> displayList;
 
             public void Initialize(CoreApplicationView applicationView)
             {
@@ -98,9 +105,50 @@ namespace DXShooting
                 this.d2dTarget = new Bitmap1(this.d2dDeviceContext, backBuffer, new BitmapProperties1(new PixelFormat(Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied), displayInfo.LogicalDpi
                     , displayInfo.LogicalDpi, BitmapOptions.Target | BitmapOptions.CannotDraw));
 
+                this.fighterDisplay = new Fighter(this.d2dDeviceContext);
+                this.fighterDisplay.SetPosition(540, 240);
+
+                this.displayList = new List<IDrawable>();
+                this.displayList.Add(this.fighterDisplay);
+
 
                 /* 様々な初期化処理を以下に書く */
+                var fighterPath = new PathGeometry(d2dDevice.Factory);
+                var sink = fighterPath.Open();
 
+                sink.BeginFigure(
+                    new Vector2(0f, 50f),
+                    FigureBegin.Filled
+                    );
+
+                sink.AddLines(
+                    new SharpDX.Mathematics.Interop.RawVector2[]
+                    {
+                        new Vector2(50f,50f)
+                        ,new Vector2(30f,100f)
+                        ,new Vector2(50f ,150f)
+                    });
+                sink.AddLines(
+                    new SharpDX.Mathematics.Interop.RawVector2[]
+                    {
+                        new Vector2(25f,200f)
+                        ,new Vector2(0f,150f)
+                        ,new Vector2(20f, 100f)
+                    });
+                sink.EndFigure(FigureEnd.Closed);
+                sink.Close();
+
+
+                this.tFighterPath = new TransformedGeometry(
+                    d2dDevice.Factory
+                    , fighterPath
+                    , Matrix3x2.Identity
+                );
+
+                this.fighterBrush = new SolidColorBrush(
+                    d2dDeviceContext
+                    , Color.OrangeRed
+                );
             }
 
             public void SetWindow(CoreWindow window)
@@ -121,6 +169,10 @@ namespace DXShooting
             {
                 Debug.WriteLine("Run");
 
+                var playerInputManager = new PlayerInputManager(this.mWindow, this.fighterDisplay);
+
+                var dx = 0;
+                var dy = 0;
 
                 while (true)
                 {
@@ -128,27 +180,30 @@ namespace DXShooting
                     this.mWindow.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessAllIfPresent);
 
                     /* 入力受付処理を以下に記述する */
+                    if (this.mWindow.GetAsyncKeyState(Windows.System.VirtualKey.Escape) == (CoreVirtualKeyStates.Down))
+                    {
+                        return;
+                    }
 
-                    /* 入力受付処理はここまで */
-
-                    /* 状態更新処理を以下に記述する */
-
-                    /* 状態更新処理はここまで */
+                    playerInputManager.CheckInputs();
 
                     this.d2dDeviceContext.Target = d2dTarget;
 
                     this.d2dDeviceContext.BeginDraw();
                     this.d2dDeviceContext.Clear(Color.CornflowerBlue);
 
-                    /* 描画処理を以下に記述する */
-
-                    /* 描画処理はここまで */
+                    foreach(var d in this.displayList)
+                    {
+                        d.Draw();
+                    }
 
                     this.d2dDeviceContext.EndDraw();
-
-                    //現在のバッファをスクリーンに表示させる。
-                    //syncInterval: フレームの同期方法、0(ブランク挟まず同期なしで表示)、1~4(nの垂直ブランクを挟んで同期させて表示)
                     this.swapChain.Present(0, PresentFlags.None);
+                    /* 入力受付処理はここまで */
+
+                    /* 状態更新処理を以下に記述する */
+
+                    /* 状態更新処理はここまで */
 
                     /* 以下にプログラムの待機処理を記述する */
                 }
@@ -160,7 +215,7 @@ namespace DXShooting
                 this.swapChain.Dispose();
                 this.d2dDeviceContext.Dispose();
                 this.d2dTarget.Dispose();
-
+                this.fighterBrush.Dispose();
             }
         }
     }
