@@ -118,6 +118,7 @@
   <ItemGroup>
     <Compile Include="App.cs" />
     <Compile Include="Fighter.cs" />
+    <Compile Include="FramePerSec.cs" />
     <Compile Include="ICrashable.cs" />
     <Compile Include="IDrawable.cs" />
     <Compile Include="IFirable.cs" />
