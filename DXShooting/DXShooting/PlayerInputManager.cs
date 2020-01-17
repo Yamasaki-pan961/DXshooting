@@ -6,9 +6,9 @@ namespace DXShooting
     public class PlayerInputManager
     {
         private CoreWindow cWindow;
-        private IMovable shooter;
+        private IShooter shooter;
 
-        public PlayerInputManager(CoreWindow cWindow, IMovable shooter)
+        public PlayerInputManager(CoreWindow cWindow, IShooter shooter)
         {
             this.cWindow = cWindow;
             this.shooter = shooter;
@@ -22,26 +22,35 @@ namespace DXShooting
         {
             return (this.cWindow.GetAsyncKeyState(key) == CoreVirtualKeyStates.Down);
         }
+
         public void CheckInputs()
         {
             var dx = 0;
             var dy = 0;
 
+
             if (CheckPressKey(VirtualKey.Right))
             {
-                dx = dx + 1;
+                dx = dx + 10;
             }
+
             if (CheckPressKey(VirtualKey.Left))
             {
-                dx = dx - 1;
+                dx = dx - 10;
             }
-            if (CheckPressKey(VirtualKey.Down))
+
+            if(CheckPressKey(VirtualKey.Down))
             {
-                dy = dy + 1;
+                dy = dy + 10;
             }
-            if (CheckPressKey(VirtualKey.Up))
+
+            if(CheckPressKey(VirtualKey.Up))
             {
-                dy = dy - 1;
+                dy = dy - 10;
+            }
+            if(CheckPressKey(VirtualKey.Space))
+            {
+                this.shooter.Fire();
             }
             this.shooter.Move(dy, dx);
         }

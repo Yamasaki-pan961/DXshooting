@@ -130,6 +130,8 @@
     <Compile Include="ITarget.cs" />
     <Compile Include="IUpdatable.cs" />
     <Compile Include="PlayerInputManager.cs" />
+    <Compile Include="PlayerShot.cs" />
+    <Compile Include="PlayerShotManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RectTargetManager.cs" />
     <Compile Include="ShootingUtils.cs" />

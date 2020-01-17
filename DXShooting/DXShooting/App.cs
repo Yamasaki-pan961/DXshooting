@@ -9,9 +9,11 @@ using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.Core;
 using Windows.Graphics.Display;
 using Windows.UI.Core;
-using Windows.UI.ViewManagement;
 using Windows.System;
 using System.Collections.Generic;
+using Windows.UI.ViewManagement;
+
+
 
 namespace DXShooting
 {
@@ -40,9 +42,13 @@ namespace DXShooting
             private Fighter fighterDisplay;
             private SwapChain1 swapChain;
             private CoreWindow mWindow;
-            private TransformedGeometry tFighterPath;
+            private TransformedGeometry tFighterPath; /// 問題9.6追加
             private SolidColorBrush fighterBrush;
             private List<IDrawable> displayList;
+            private PlayerShotManager playerShotManager;
+            private SimpleEnemy enemyDisplay;
+
+            /// 問題9.6追加
 
             public void Initialize(CoreApplicationView applicationView)
             {
@@ -58,7 +64,8 @@ namespace DXShooting
 
             }
 
-            void CreateDeviceResources()
+
+            private void CreateDeviceResources()
             {
                 /// デフォルトDirect3Dデバイスの作成（取得）
                 var defaultDevice = new SharpDX.Direct3D11.Device(DriverType.Hardware, DeviceCreationFlags.Debug | DeviceCreationFlags.BgraSupport);
@@ -105,50 +112,40 @@ namespace DXShooting
                 this.d2dTarget = new Bitmap1(this.d2dDeviceContext, backBuffer, new BitmapProperties1(new PixelFormat(Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied), displayInfo.LogicalDpi
                     , displayInfo.LogicalDpi, BitmapOptions.Target | BitmapOptions.CannotDraw));
 
-                this.fighterDisplay = new Fighter(this.d2dDeviceContext);
+                /// 自機の作成
+                this.playerShotManager = new PlayerShotManager(this.d2dDeviceContext);
+                this.fighterDisplay = new Fighter(this.d2dDeviceContext, playerShotManager);
                 this.fighterDisplay.SetPosition(540, 240);
 
                 this.displayList = new List<IDrawable>();
                 this.displayList.Add(this.fighterDisplay);
+                this.displayList.Add(this.playerShotManager);
 
+                //敵機の作成
+                this.enemyDisplay = new SimpleEnemy(this.d2dDeviceContext);
+                this.enemyDisplay.SetPosition(50, 240);
+
+                this.displayList.Add(this.enemyDisplay);
+
+                
 
                 /* 様々な初期化処理を以下に書く */
                 var fighterPath = new PathGeometry(d2dDevice.Factory);
+
                 var sink = fighterPath.Open();
 
-                sink.BeginFigure(
-                    new Vector2(0f, 50f),
-                    FigureBegin.Filled
-                    );
+                sink.BeginFigure(new Vector2(50f, 0f), FigureBegin.Filled);
 
-                sink.AddLines(
-                    new SharpDX.Mathematics.Interop.RawVector2[]
-                    {
-                        new Vector2(50f,50f)
-                        ,new Vector2(30f,100f)
-                        ,new Vector2(50f ,150f)
-                    });
-                sink.AddLines(
-                    new SharpDX.Mathematics.Interop.RawVector2[]
-                    {
-                        new Vector2(25f,200f)
-                        ,new Vector2(0f,150f)
-                        ,new Vector2(20f, 100f)
-                    });
+                sink.AddLines(new SharpDX.Mathematics.Interop.RawVector2[]
+                {
+                    new Vector2(0f, 0f), new Vector2(0f, 50f), new Vector2(50f,50f)
+                });
                 sink.EndFigure(FigureEnd.Closed);
                 sink.Close();
 
+                this.tFighterPath = new TransformedGeometry(d2dDevice.Factory, fighterPath, Matrix3x2.Identity);
+                this.fighterBrush = new SolidColorBrush(d2dDeviceContext, Color.OrangeRed);
 
-                this.tFighterPath = new TransformedGeometry(
-                    d2dDevice.Factory
-                    , fighterPath
-                    , Matrix3x2.Identity
-                );
-
-                this.fighterBrush = new SolidColorBrush(
-                    d2dDeviceContext
-                    , Color.OrangeRed
-                );
             }
 
             public void SetWindow(CoreWindow window)
@@ -169,41 +166,54 @@ namespace DXShooting
             {
                 Debug.WriteLine("Run");
 
-                var playerInputManager = new PlayerInputManager(this.mWindow, this.fighterDisplay);
-
                 var dx = 0;
                 var dy = 0;
+                var playerInputManager = new PlayerInputManager(this.mWindow, this.fighterDisplay);
 
                 while (true)
                 {
 
+                    var fTransform = tFighterPath.Transform;
+                    fTransform.M31 = dx;
+                    fTransform.M32 = dy;
+                    this.d2dDeviceContext.Transform = fTransform;
+                    this.mWindow.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessAllIfPresent);
+
                     this.mWindow.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessAllIfPresent);
 
                     /* 入力受付処理を以下に記述する */
-                    if (this.mWindow.GetAsyncKeyState(Windows.System.VirtualKey.Escape) == (CoreVirtualKeyStates.Down))
+                    if (this.mWindow.GetAsyncKeyState(Windows.System.VirtualKey.Escape) == CoreVirtualKeyStates.Down)
                     {
                         return;
                     }
 
                     playerInputManager.CheckInputs();
 
+
+
                     this.d2dDeviceContext.Target = d2dTarget;
 
                     this.d2dDeviceContext.BeginDraw();
                     this.d2dDeviceContext.Clear(Color.CornflowerBlue);
 
-                    foreach(var d in this.displayList)
+                    /* 入力受付処理はここまで */
+
+                    /* 状態更新処理を以下に記述する */
+                    this.playerShotManager.Update();
+                    /* 状態更新処理はここまで */
+
+                    /* 描画処理を以下に記述する */
+                    foreach (var d in this.displayList)
                     {
                         d.Draw();
                     }
 
                     this.d2dDeviceContext.EndDraw();
+                    /* 描画処理はここまで */
+
+                    //現在のバッファをスクリーンに表示させる。
+                    //syncInterval: フレームの同期方法、0(ブランク挟まず同期なしで表示)、1~4(nの垂直ブランクを挟んで同期させて表示)
                     this.swapChain.Present(0, PresentFlags.None);
-                    /* 入力受付処理はここまで */
-
-                    /* 状態更新処理を以下に記述する */
-
-                    /* 状態更新処理はここまで */
 
                     /* 以下にプログラムの待機処理を記述する */
                 }

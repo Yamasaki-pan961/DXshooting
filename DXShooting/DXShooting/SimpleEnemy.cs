@@ -36,8 +36,29 @@ namespace DXShooting
 
         private void Initialize()
         {
-            /// 未実装
-            throw new NotImplementedException();
+            /// 実装
+            this.isVisible = true;
+
+            this.x = 0;
+            this.y = 0;
+
+            var path = new PathGeometry(this.d2dDevice.Factory);
+
+            this.firstPoint = new Vector2(0f, 0f);
+            this.secondPoint = new Vector2(50f, 0f);
+            this.thirdPoint = new Vector2(25f, 50f);
+
+            var sink = path.Open();
+
+            sink.BeginFigure(this.firstPoint, FigureBegin.Filled);
+            sink.AddLines(new SharpDX.Mathematics.Interop.RawVector2[] { this.secondPoint, this.thirdPoint });
+
+            sink.EndFigure(FigureEnd.Closed);
+            sink.Close();
+
+            this.enemyPath = new TransformedGeometry(this.d2dDevice.Factory, path, Matrix3x2.Identity);
+
+            this.enemyBrush = new SolidColorBrush(this.d2dDeviceContext, Color.Black);
         }
 
         /// <summary>
@@ -50,14 +71,25 @@ namespace DXShooting
 
         public void Draw()
         {
-            /// 未実装
-            throw new NotImplementedException();
+            /// 実装
+            if (this.isVisible)
+            {
+                var eTransform = this.enemyPath.Transform;
+                eTransform.M31 = this.x;
+                eTransform.M32 = this.y;
+
+                this.d2dDeviceContext.Transform = eTransform;
+
+                this.d2dDeviceContext.FillGeometry(this.enemyPath, this.enemyBrush);
+
+                this.d2dDeviceContext.Transform = this.enemyPath.Transform;
+            }
         }
 
         public bool IsHitted(IRectBounds c)
         {
-            /// 未実装
-            throw new NotImplementedException();
+        /// 未実装
+            return ShootingUtils.IsIntersected(this , c);
         }
 
         /// <summary>
@@ -130,7 +162,14 @@ namespace DXShooting
         public void MoveNext()
         {
             ///未実装
-            throw new NotImplementedException();
+            if(this.IsMovable())
+            {
+                this.Move(MOVE_SPEED, 0);
+            }
+            else
+            {
+                this.isVisible = false;
+            }
         }
 
 

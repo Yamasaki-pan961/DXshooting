@@ -4,11 +4,12 @@ using System;
 
 namespace DXShooting
 {
-    public class Fighter : IDrawable, IMovable
+    public class Fighter : IDrawable, IShooter
     {
         private DeviceContext d2dDeviceContext;
         private Device d2dDevice;
         private TransformedGeometry fighterPath;
+        private PlayerShotManager shotManager;
         private SolidColorBrush fighterBrush;
         private int x;
         private int y;
@@ -16,18 +17,19 @@ namespace DXShooting
         private Vector2 secondPoint;
         private Vector2 thirdPoint;
 
-        public Fighter(DeviceContext ctx)
+        public Fighter(DeviceContext ctx, PlayerShotManager manager)
         {
             this.d2dDeviceContext = ctx;
             this.d2dDevice = ctx.Device;
 
+            this.shotManager = manager;
             this.Initialize();
         }
 
         private void Initialize()
         {
             this.x = 0;
-            this.y = 0; 
+            this.y = 0;
 
             var path = new PathGeometry(this.d2dDevice.Factory);
 
@@ -48,6 +50,7 @@ namespace DXShooting
 
             this.fighterBrush = new SolidColorBrush(this.d2dDeviceContext, Color.OrangeRed);
         }
+
         public void Draw()
         {
             var fTransform = this.fighterPath.Transform;
@@ -58,33 +61,39 @@ namespace DXShooting
 
             this.d2dDeviceContext.DrawGeometry(this.fighterPath, this.fighterBrush);
 
-            this.d2dDeviceContext.Transform = fighterPath.Transform;
+            this.d2dDeviceContext.Transform = this.fighterPath.Transform;
         }
 
         public bool IsMovable()
         {
-            if(this.y >= 0 && this.x >= 0)
+            if(this.y >= 0 && this.x >=0)
             {
                 return true;
             }
+
             else
             {
                 return false;
             }
         }
 
+
         public void Move(int dy, int dx)
         {
             this.x = this.x + dx;
             this.y = this.y + dy;
-            //this.shotManager.Move(dy, dx);
+            this.shotManager.Move(dy, dx);
         }
 
         public void SetPosition(int y, int x)
         {
             this.y = y - 25;
             this.x = x - 25;
-            //this.shotManager.SetPosition(this.y, this.x);
+            this.shotManager.SetPosition(this.y, this.x);
+        }
+        public void Fire()
+        {
+            this.shotManager.Fire();
         }
     }
 }

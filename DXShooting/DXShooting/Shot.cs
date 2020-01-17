@@ -22,17 +22,22 @@ namespace DXShooting
 
         public bool IsMovable()
         {
-            throw new NotImplementedException();
+           if(this.center.X >= 0 && this.center.Y >= 0)
+            {
+                return true;
+            }
+           else
+            {
+                return false;
+            }
         }
 
         public void Move(int dy, int dx)
         {
-            throw new NotImplementedException();
+            this.center.X = this.center.X + dx;
+            this.center.Y = this.center.Y + dy;
         }
 
-        public void SetPosition(int y, int x)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract void SetPosition(int y, int x);
     }
 }
