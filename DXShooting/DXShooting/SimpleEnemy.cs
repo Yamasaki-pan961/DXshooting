@@ -45,8 +45,8 @@ namespace DXShooting
             var path = new PathGeometry(this.d2dDevice.Factory);
 
             this.firstPoint = new Vector2(0f, 0f);
-            this.secondPoint = new Vector2(50f, 0f);
-            this.thirdPoint = new Vector2(25f, 50f);
+            this.secondPoint = new Vector2(MAX_X, 0f) ;
+            this.thirdPoint = new Vector2(MAX_X/2, MAX_Y);
 
             var sink = path.Open();
 
