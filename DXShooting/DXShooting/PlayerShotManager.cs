@@ -81,7 +81,7 @@ namespace DXShooting
                 var d = this.drawList[i];
                 if (d.IsHitted(c))
                 {
-                    d.Crach();
+                    d.Crash();
                     this.shotList.Add(d);
                     this.drawList.RemoveAt(i);
                     return true;

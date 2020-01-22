@@ -64,6 +64,8 @@ namespace DXShooting
 
             }
 
+            private List<IUpdatable> updateList;
+            private RectTargetManager targetManager;
 
             private void CreateDeviceResources()
             {
@@ -112,19 +114,24 @@ namespace DXShooting
                 this.d2dTarget = new Bitmap1(this.d2dDeviceContext, backBuffer, new BitmapProperties1(new PixelFormat(Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied), displayInfo.LogicalDpi
                     , displayInfo.LogicalDpi, BitmapOptions.Target | BitmapOptions.CannotDraw));
 
+                this.updateList = new List<IUpdatable>();
+
                 /// 自機の作成
                 this.playerShotManager = new PlayerShotManager(this.d2dDeviceContext);
+                this.updateList.Add(this.playerShotManager);
                 this.fighterDisplay = new Fighter(this.d2dDeviceContext, playerShotManager);
                 this.fighterDisplay.SetPosition(540, 240);
 
                 this.displayList = new List<IDrawable>();
                 this.displayList.Add(this.fighterDisplay);
                 this.displayList.Add(this.playerShotManager);
+                this.targetManager = new RectTargetManager(this.d2dDeviceContext, this.playerShotManager);
+                this.displayList.Add(this.targetManager);
+                this.updateList.Add(this.targetManager);
 
                 //敵機の作成
                 this.enemyDisplay = new SimpleEnemy(this.d2dDeviceContext);
                 this.enemyDisplay.SetPosition(50, 240);
-
                 this.displayList.Add(this.enemyDisplay);
 
                 
@@ -189,7 +196,10 @@ namespace DXShooting
 
                     playerInputManager.CheckInputs();
 
-
+                    foreach(var u in this.updateList)
+                    {
+                        u.Update();
+                    }
 
                     this.d2dDeviceContext.Target = d2dTarget;
 
