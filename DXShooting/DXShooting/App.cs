@@ -66,7 +66,7 @@ namespace DXShooting
 
             private List<IUpdatable> updateList;
             private RectTargetManager targetManager;
-
+            private FramePerSec fpsController;
             private void CreateDeviceResources()
             {
                 /// デフォルトDirect3Dデバイスの作成（取得）
@@ -153,6 +153,7 @@ namespace DXShooting
                 this.tFighterPath = new TransformedGeometry(d2dDevice.Factory, fighterPath, Matrix3x2.Identity);
                 this.fighterBrush = new SolidColorBrush(d2dDeviceContext, Color.OrangeRed);
 
+                this.fpsController = new FramePerSec(this.d2dDeviceContext);
             }
 
             public void SetWindow(CoreWindow window)
@@ -177,6 +178,7 @@ namespace DXShooting
                 var dy = 0;
                 var playerInputManager = new PlayerInputManager(this.mWindow, this.fighterDisplay);
 
+                this.fpsController.StartUp();
                 while (true)
                 {
 
@@ -226,6 +228,7 @@ namespace DXShooting
                     this.swapChain.Present(0, PresentFlags.None);
 
                     /* 以下にプログラムの待機処理を記述する */
+                    this.fpsController.Record();
                 }
             }
 
