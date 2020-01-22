@@ -25,9 +25,18 @@ namespace DXShooting
 
         private void Initialize()
         {
-            ///未実装
-            throw new NotImplementedException();
+            this.targetList = new List<IMovableRectTarget>();
+
+            this.rng = new Random();
+
+            for(int i = 0; i < ENEMY_MAX_NUM; i = i + 1)
+            {
+                var enemy = new SimpleEnemy(this.context);
+                this.targetList.Add(enemy);
+            }
         }
+
+        private const int MAX_WIDTH = 480;
 
         /// <summary>
         /// 敵リストから敵オブジェクトを取得する。
@@ -50,7 +59,7 @@ namespace DXShooting
 
         private void InitializePosition(IMovable e)
         {
-            e.SetPosition(0, 10 + this.rng.Next(0, 540));
+            e.SetPosition(0, 10 + this.rng.Next(0, MAX_WIDTH));
         }
 
 
@@ -64,8 +73,19 @@ namespace DXShooting
 
         public void Update()
         {
-            /// 未実装
-            throw new NotImplementedException();
+            for(int i = 0; i < this.targetList.Count; i = i + 1)
+            {
+                var t = this.targetList[i];
+                if(!t.IsCrashing() && this.playerShotManager.IsHitted(t))
+                {
+                    t.Crash();
+                }
+                t.MoveNext();
+                if(t.IsFinished())
+                {
+                    InitializePosition(t);
+                }
+            }
         }
     }
 }

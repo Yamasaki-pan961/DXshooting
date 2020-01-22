@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DXShooting
 {
-    public class PlayerShotManager : IDrawable, IMovable, IFirable
+    public class PlayerShotManager : IDrawable, IMovable, IFirable, IUpdatable, IHittable
     {
         private DeviceContext d2dDeviceContext;
         private List<Shot> shotList;
@@ -73,6 +73,21 @@ namespace DXShooting
                     this.drawList.RemoveAt(i);
                 }
             }
+        }
+        public bool IsHitted(IRectBounds c)
+        {
+            for(int i= 0; i < this.drawList.Count; i = i + 1)
+            {
+                var d = this.drawList[i];
+                if (d.IsHitted(c))
+                {
+                    d.Crach();
+                    this.shotList.Add(d);
+                    this.drawList.RemoveAt(i);
+                    return true;
+                }
+            }
+            return false;
         }
 
         public void Move(int dy, int dx)
