@@ -37,6 +37,10 @@ namespace DXShooting
 
         class FrameworkView : IFrameworkView
         {
+            //9.3 
+            private TransformedGeometry tFighterPath;
+            private SolidColorBrush fighterBrush;
+            //---
             private SharpDX.Direct2D1.DeviceContext d2dDeviceContext;
             private Bitmap1 d2dTarget;
             private Fighter fighterDisplay;
@@ -223,15 +227,10 @@ namespace DXShooting
                     this.d2dDeviceContext.EndDraw();
                     /* 描画処理はここまで */
 
-                    //現在のバッファをスクリーンに表示させる。
-                    //syncInterval: フレームの同期方法、0(ブランク挟まず同期なしで表示)、1~4(nの垂直ブランクを挟んで同期させて表示)
                     this.swapChain.Present(0, PresentFlags.None);
-
                     /* 以下にプログラムの待機処理を記述する */
                     this.fpsController.Record();
                 }
-            }
-
             public void Uninitialize()
             {
                 Debug.WriteLine("Uninitialize");
