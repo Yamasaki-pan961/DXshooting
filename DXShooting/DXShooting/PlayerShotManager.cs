@@ -30,7 +30,7 @@ namespace DXShooting
 
             this.shotList = new List<Shot>();
 
-            for(int i = 0; i < SHOT_NUM_MAX; i = i +1)
+            for (int i = 0; i < SHOT_NUM_MAX; i = i + 1)
             {
                 this.shotList.Add(new PlayerShot(this.d2dDeviceContext));
             }
@@ -51,7 +51,7 @@ namespace DXShooting
 
         public void Draw()
         {
-            for(int i= 0; i< this.drawList.Count; i = i+1)
+            for (int i = 0; i < this.drawList.Count; i = i + 1)
             {
                 this.drawList[i].Draw();
             }
@@ -76,7 +76,7 @@ namespace DXShooting
         }
         public bool IsHitted(IRectBounds c)
         {
-            for(int i= 0; i < this.drawList.Count; i = i + 1)
+            for (int i = 0; i < this.drawList.Count; i = i + 1)
             {
                 var d = this.drawList[i];
                 if (d.IsHitted(c))
@@ -101,10 +101,10 @@ namespace DXShooting
             this.y = y;
             this.x = x;
         }
-        
+
         public bool IsMovable()
         {
-            if(this.y >= 0 && this.x >= 0)
+            if (this.y >= 0 && this.x >= 0)
             {
                 return true;
             }
@@ -114,3 +114,4 @@ namespace DXShooting
             }
         }
     }
+}

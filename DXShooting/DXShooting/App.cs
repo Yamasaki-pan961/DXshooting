@@ -37,10 +37,6 @@ namespace DXShooting
 
         class FrameworkView : IFrameworkView
         {
-            //9.3 
-            private TransformedGeometry tFighterPath;
-            private SolidColorBrush fighterBrush;
-            //---
             private SharpDX.Direct2D1.DeviceContext d2dDeviceContext;
             private Bitmap1 d2dTarget;
             private Fighter fighterDisplay;
@@ -202,7 +198,7 @@ namespace DXShooting
 
                     playerInputManager.CheckInputs();
 
-                    foreach(var u in this.updateList)
+                    foreach (var u in this.updateList)
                     {
                         u.Update();
                     }
@@ -231,6 +227,7 @@ namespace DXShooting
                     /* 以下にプログラムの待機処理を記述する */
                     this.fpsController.Record();
                 }
+            }
             public void Uninitialize()
             {
                 Debug.WriteLine("Uninitialize");
