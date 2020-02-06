@@ -130,8 +130,9 @@ namespace DXShooting
                 this.displayList.Add(this.targetManager);
                 this.updateList.Add(this.targetManager);
 
+
                 //敵機の作成
-                this.enemyDisplay = new SimpleEnemy(this.d2dDeviceContext);
+                this.enemyDisplay = new SimpleEnemy(this.d2dDeviceContext,targetManager.rng);
                 this.enemyDisplay.SetPosition(50, 240);
                 this.displayList.Add(this.enemyDisplay);
 

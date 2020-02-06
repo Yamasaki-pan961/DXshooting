@@ -31,7 +31,7 @@ namespace DXShooting
 
             for(int i = 0; i < ENEMY_MAX_NUM; i = i + 1)
             {
-                var enemy = new SimpleEnemy(this.context);
+                var enemy = new SimpleEnemy(this.context, this.rng);
                 this.targetList.Add(enemy);
             }
         }

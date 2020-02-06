@@ -20,16 +20,19 @@ namespace DXShooting
         private Vector2 secondPoint;
         private Vector2 thirdPoint;
 
-        private const float MAX_X = 20f;
-        private const float MAX_Y = 20f;
+        private const float MAX_X = 60f;
+        private const float MAX_Y = 60f;
         private const int MOVE_SPEED = 2;
 
+        private int n;
         private bool isVisible;
 
-        public SimpleEnemy(DeviceContext ctx)
+        public SimpleEnemy(DeviceContext ctx, Random rng)
         {
             this.d2dDeviceContext = ctx;
             this.d2dDevice = ctx.Device;
+
+            this.n = rng.Next(1, 4);
 
             this.Initialize();
         }
@@ -45,8 +48,8 @@ namespace DXShooting
             var path = new PathGeometry(this.d2dDevice.Factory);
 
             this.firstPoint = new Vector2(0f, 0f);
-            this.secondPoint = new Vector2(MAX_X, 0f) ;
-            this.thirdPoint = new Vector2(MAX_X/2, MAX_Y);
+            this.secondPoint = new Vector2(MAX_X / this.n, 0f);
+            this.thirdPoint = new Vector2(MAX_X / 2 / this.n, MAX_Y / this.n);
 
             var sink = path.Open();
 
