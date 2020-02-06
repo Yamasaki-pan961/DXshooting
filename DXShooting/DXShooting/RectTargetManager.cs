@@ -13,12 +13,15 @@ namespace DXShooting
 
         public const int ENEMY_MAX_NUM = 10;
         public Random rng;
+        private Scorer PlayerScorer;
 
-        public RectTargetManager(DeviceContext ctx, PlayerShotManager playerShotManager)
+        public RectTargetManager(DeviceContext ctx, PlayerShotManager playerShotManager, Scorer PlayerScorer)
         {
             this.context = ctx;
 
             this.playerShotManager = playerShotManager;
+
+            this.PlayerScorer = PlayerScorer;
 
             this.Initialize();
         }
@@ -31,7 +34,7 @@ namespace DXShooting
 
             for(int i = 0; i < ENEMY_MAX_NUM; i = i + 1)
             {
-                var enemy = new SimpleEnemy(this.context, this.rng);
+                var enemy = new SimpleEnemy(this.context, this.rng,this.PlayerScorer);
                 this.targetList.Add(enemy);
             }
         }

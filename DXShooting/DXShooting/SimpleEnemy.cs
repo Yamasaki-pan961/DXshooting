@@ -27,11 +27,13 @@ namespace DXShooting
         private int n;
         private bool isVisible;
 
-        public SimpleEnemy(DeviceContext ctx, Random rng)
+        private Scorer PlayerScorer;
+
+        public SimpleEnemy(DeviceContext ctx, Random rng, Scorer PlayerScorer)
         {
             this.d2dDeviceContext = ctx;
             this.d2dDevice = ctx.Device;
-
+            this.PlayerScorer = PlayerScorer;
             this.n = rng.Next(1, 4);
 
             this.Initialize();
@@ -69,6 +71,7 @@ namespace DXShooting
         /// </summary>
         public void Crash()
         {
+            this.PlayerScorer.AddScore(this.n * 10);
             this.isVisible = false;
         }
 

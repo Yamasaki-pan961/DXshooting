@@ -46,7 +46,7 @@ namespace DXShooting
             private SolidColorBrush fighterBrush;
             private List<IDrawable> displayList;
             private PlayerShotManager playerShotManager;
-            private SimpleEnemy enemyDisplay;
+            private Scorer PlayerScorer;
 
             /// 問題9.6追加
 
@@ -115,6 +115,7 @@ namespace DXShooting
                 this.d2dTarget = new Bitmap1(this.d2dDeviceContext, backBuffer, new BitmapProperties1(new PixelFormat(Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied), displayInfo.LogicalDpi
                     , displayInfo.LogicalDpi, BitmapOptions.Target | BitmapOptions.CannotDraw));
 
+                this.PlayerScorer = new Scorer(this.d2dDeviceContext);
                 this.updateList = new List<IUpdatable>();
 
                 /// 自機の作成
@@ -126,17 +127,11 @@ namespace DXShooting
                 this.displayList = new List<IDrawable>();
                 this.displayList.Add(this.fighterDisplay);
                 this.displayList.Add(this.playerShotManager);
-                this.targetManager = new RectTargetManager(this.d2dDeviceContext, this.playerShotManager);
+                this.targetManager = new RectTargetManager(this.d2dDeviceContext, this.playerShotManager,this.PlayerScorer);
                 this.displayList.Add(this.targetManager);
                 this.updateList.Add(this.targetManager);
 
-
-                //敵機の作成
-                this.enemyDisplay = new SimpleEnemy(this.d2dDeviceContext,targetManager.rng);
-                this.enemyDisplay.SetPosition(50, 240);
-                this.displayList.Add(this.enemyDisplay);
-
-                
+                this.displayList.Add(this.PlayerScorer);
 
                 /* 様々な初期化処理を以下に書く */
                 var fighterPath = new PathGeometry(d2dDevice.Factory);
@@ -161,6 +156,7 @@ namespace DXShooting
 
                 this.displayList.Add(this.enemyShotManager);
                 this.updateList.Add(this.enemyShotManager);
+
             }
 
             public void SetWindow(CoreWindow window)
