@@ -67,6 +67,7 @@ namespace DXShooting
             private List<IUpdatable> updateList;
             private RectTargetManager targetManager;
             private FramePerSec fpsController;
+            private EnemyShotManager enemyShotManager;
             private void CreateDeviceResources()
             {
                 /// デフォルトDirect3Dデバイスの作成（取得）
@@ -154,6 +155,11 @@ namespace DXShooting
                 this.fighterBrush = new SolidColorBrush(d2dDeviceContext, Color.OrangeRed);
 
                 this.fpsController = new FramePerSec(this.d2dDeviceContext);
+
+                this.enemyShotManager = new EnemyShotManager(this.d2dDeviceContext, this.targetManager, this.fighterDisplay);
+
+                this.displayList.Add(this.enemyShotManager);
+                this.updateList.Add(this.enemyShotManager);
             }
 
             public void SetWindow(CoreWindow window)

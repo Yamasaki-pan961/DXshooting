@@ -4,7 +4,7 @@ using System;
 
 namespace DXShooting
 {
-    public class Fighter : IDrawable, IShooter
+    public class Fighter : IShooter, IMovableRectTarget
     {
         private DeviceContext d2dDeviceContext;
         private Device d2dDevice;
@@ -16,7 +16,9 @@ namespace DXShooting
         private Vector2 firstPoint;
         private Vector2 secondPoint;
         private Vector2 thirdPoint;
-
+        private bool isVisible;
+        private const float MAX_X = 50f;
+        private const float MAX_Y = 50f;
         public Fighter(DeviceContext ctx, PlayerShotManager manager)
         {
             this.d2dDeviceContext = ctx;
@@ -33,9 +35,10 @@ namespace DXShooting
 
             var path = new PathGeometry(this.d2dDevice.Factory);
 
-            this.firstPoint = new Vector2(25f, 0f);
-            this.secondPoint = new Vector2(50f, 50f);
-            this.thirdPoint = new Vector2(0f, 50f);
+            this.isVisible = true;
+            this.firstPoint = new Vector2(MAX_X / 2, 0f);
+            this.secondPoint = new Vector2(MAX_X, MAX_Y);
+            this.thirdPoint = new Vector2(0f, MAX_Y);
 
             var sink = path.Open();
 
@@ -53,24 +56,26 @@ namespace DXShooting
 
         public void Draw()
         {
-            var fTransform = this.fighterPath.Transform;
-            fTransform.M31 = this.x;
-            fTransform.M32 = this.y;
+            if (this.isVisible)
+            {
+                var fTransform = this.fighterPath.Transform;
+                fTransform.M31 = this.x;
+                fTransform.M32 = this.y;
 
-            this.d2dDeviceContext.Transform = fTransform;
+                this.d2dDeviceContext.Transform = fTransform;
 
-            this.d2dDeviceContext.DrawGeometry(this.fighterPath, this.fighterBrush);
+                this.d2dDeviceContext.DrawGeometry(this.fighterPath, this.fighterBrush);
 
-            this.d2dDeviceContext.Transform = this.fighterPath.Transform;
+                this.d2dDeviceContext.Transform = this.fighterPath.Transform;
+            }
         }
 
         public bool IsMovable()
         {
-            if(this.y >= 0 && this.x >=0)
+            if (this.y >= 0 && this.y < 600 && this.x >= 0 && this.x < 440)
             {
                 return true;
             }
-
             else
             {
                 return false;
@@ -80,9 +85,21 @@ namespace DXShooting
 
         public void Move(int dy, int dx)
         {
+            var bx = this.x;
+            var by = this.y;
+
             this.x = this.x + dx;
             this.y = this.y + dy;
-            this.shotManager.Move(dy, dx);
+
+            if (this.IsMovable())
+            {
+                this.shotManager.Move(dy, dx);
+            }
+            else
+            {
+                this.x = bx;
+                this.y = by;
+            }
         }
 
         public void SetPosition(int y, int x)
@@ -93,7 +110,63 @@ namespace DXShooting
         }
         public void Fire()
         {
-            this.shotManager.Fire();
+            if (this.isVisible)
+            {
+                this.shotManager.Fire();
+            }
+        }
+
+        public void MoveNext()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public int GetCenterX()
+        {
+            return this.x;
+        }
+
+        public int GetCenterY()
+        {
+            return this.y;
+        }
+
+        public bool IsHitted(IRectBounds c)
+        {
+            return ShootingUtils.IsIntersected(this, c);
+        }
+
+        public void Crash()
+        {
+            this.isVisible = false;
+        }
+        public bool IsFinished()
+        {
+            return !this.isVisible;
+        }
+        public bool IsCrashing()
+        {
+            return !this.isVisible;
+        }
+
+        public int GetNorthEastX()
+        {
+            return (int)(this.x + MAX_X * 3 / 4);
+        }
+
+        public int GetNorthEastY()
+        {
+            return (int)(this.y + MAX_Y * 3 / 4);
+        }
+
+        public int GetSouthWestX()
+        {
+            return (int)(this.x + MAX_X / 4);
+        }
+
+        public int GetSouthWestY()
+        {
+            return (int)((this.y + MAX_Y));
         }
     }
 }

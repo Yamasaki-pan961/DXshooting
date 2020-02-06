@@ -117,6 +117,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="EnemyShot.cs" />
+    <Compile Include="EnemyShotManager.cs" />
     <Compile Include="Fighter.cs" />
     <Compile Include="FramePerSec.cs" />
     <Compile Include="ICrashable.cs" />

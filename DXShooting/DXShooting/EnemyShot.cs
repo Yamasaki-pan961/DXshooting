@@ -60,31 +60,41 @@ namespace DXShooting
         /// <param name="x"></param>
         public override void SetPosition(int y, int x)
         {
-            ///未実装
+            this.center.Y = y + 25f;
+            this.center.X = x + 25f;
+
+            this.targetX = this.player.GetCenterX();
+            this.targetY = this.player.GetCenterY();
+
+            double dY = this.targetY - this.center.Y;
+            double dX = this.targetX - this.center.X;
+
+            this.rad = Math.Atan2(dX, dY);
+
+            this.dSpeedX = -(float)(this.speed * Math.Asin(this.rad));
+            this.dSpeedY = -(float)(this.speed * Math.Asin(this.rad));
+
+            this.isVisible = true;
         }
 
         public int GetNorthEastX()
         {
-            ///未実装
-            throw new NotImplementedException();
+            return (int)(this.center.X + MAX_X - INNER_DIFF);
         }
 
         public int GetNorthEastY()
         {
-            ///未実装
-            throw new NotImplementedException();
+            return (int)(this.center.Y - (MAX_X - INNER_DIFF));
         }
 
         public int GetSouthWestX()
         {
-            ///未実装
-            throw new NotImplementedException();
+            return (int)(this.center.X - (MAX_X - INNER_DIFF));
         }
 
         public int GetSouthWestY()
         {
-            ///未実装
-            throw new NotImplementedException();
+            return (int)(this.center.Y + MAX_X - INNER_DIFF);
         }
 
 

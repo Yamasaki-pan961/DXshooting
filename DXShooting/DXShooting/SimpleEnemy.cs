@@ -175,14 +175,12 @@ namespace DXShooting
 
         public int GetCenterX()
         {
-            ///未実装
-            throw new NotImplementedException();
+            return this.x;
         }
 
         public int GetCenterY()
         {
-            ///未実装
-            throw new NotImplementedException();
+            return this.y;
         }
     }
 }

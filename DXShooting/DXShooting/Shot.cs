@@ -27,7 +27,7 @@ namespace DXShooting
 
         public bool IsMovable()
         {
-           if(this.center.X >= 0 && this.center.Y >= 0)
+           if(this.center.X >= 0 && this.center.Y >= 0&& this.center.X < 480 && this.center.Y < 640)
             {
                 return true;
             }

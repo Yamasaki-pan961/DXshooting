@@ -43,23 +43,71 @@ namespace DXShooting
 
         private void SetFire()
         {
-            ///未実装
+            if (this.drawList.Count < SHOT_NUM_MAX)
+            {
+                //0以上のenemiseのSimpleEnemyオブジェクトの個数未満の整数を取得する。
+                var eIndex = this.rng.Next(0, this.enemies.GetEnemyCount());
+
+                var enemy = this.enemies.GetEnemy(eIndex);
+
+                var shot = this.shotList[0];
+                shot.SetPosition(enemy.GetCenterY(), enemy.GetCenterX() - 15);
+
+                this.drawList.Add(shot);
+
+                this.shotList.RemoveAt(0);
+            }
         }
 
         public void Update()
         {
-            ///未実装
+            //０以上２未満の整数値をランダムに取得し、０だったらSetFireを呼び出す
+            if (this.rng.Next(0, 2) == 0)
+            {
+                this.SetFire();
+            }
+
+            for (int i = 0; i < this.drawList.Count; i++)
+            {
+                var shot = this.drawList[i];
+                if (!this.player.IsCrashing() && this.player.IsHitted(shot))
+                {
+                    this.player.Crash();
+                }
+                if (shot.IsMovable())
+                {
+                    shot.MoveNext();
+                }
+                else
+                {
+                    this.shotList.Add(shot);
+                    this.drawList.RemoveAt(i);
+                }
+            }
         }
 
         public bool IsHitted(IRectBounds c)
         {
-            ///未実装
-            throw new NotImplementedException();
+            for(int i = 0; i < this.drawList.Count; i++)
+            {
+                var d = this.drawList[i];
+                if (d.IsHitted(c))
+                {
+                    d.Crash();
+                    this.shotList.Add(d);
+                    this.drawList.RemoveAt(i);
+                    return true;
+                }
+            }
+            return false;
         }
 
         public void Draw()
         {
-            ///未実装
+            for (int i = 0; i < this.drawList.Count; i++)
+            {
+                this.drawList[i].Draw();
+            }
         }
     }
 }
